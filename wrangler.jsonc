@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "telegram-ai-bot",
+  "name": "my-telegram-bot",
   "main": "index.js",
   "compatibility_date": "2026-11-10",
   "observability": { "enabled": true },
