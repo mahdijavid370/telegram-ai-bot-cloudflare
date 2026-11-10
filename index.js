@@ -343,7 +343,11 @@ async function telegramRequest(env, method, payload) {
 }
 
 async function getProvider(chatId, userId, env) {
-  const saved = env.CHAT_KV ? await env.CHAT_KV.get(providerKey(chatId, userId)) : null;
+  let saved = env.CHAT_KV ? await env.CHAT_KV.get(providerKey(chatId, userId)) : null;
+  // Preserve the previous private-chat provider preference during migration.
+  if (!saved && env.CHAT_KV && chatId === userId) {
+    saved = await env.CHAT_KV.get("provider_" + chatId);
+  }
   const configured = (env.DEFAULT_PROVIDER || DEFAULTS.provider).toLowerCase();
   return PROVIDERS[saved] ? saved : (PROVIDERS[configured] ? configured : DEFAULTS.provider);
 }
