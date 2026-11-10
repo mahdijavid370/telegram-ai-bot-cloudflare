@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Telegram AI bot template for Cloudflare Workers with Gemini and Coarena providers",
+  "description": "Multi-provider Telegram AI bot for Cloudflare Workers with Gemini, Coarena and Cohere",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "kv:create": "wrangler kv namespace create CHAT_KV",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "test": "node --test"
   },
-  "devDependencies": { "wrangler": "^4.0.0" }
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
 }
