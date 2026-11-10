@@ -5,7 +5,7 @@ const DEFAULTS = {
   provider: "coarena",
   coarenaModel: "gemini-3-8-flash",
   coarenaBaseUrl: "https://coarena.ai/api/v1",
-  googleModel: "gemini-2.5-flash",
+  openrouterModel: "openai/gpt-4o-mini",
   cohereModel: "command-a-03-2025",
   maxHistoryMessages: 20,
   maxTelegramLength: 3900,
@@ -13,7 +13,7 @@ const DEFAULTS = {
 };
 
 const PROVIDERS = {
-  gemini: { title: "Google Gemini", envKey: "GOOGLEAISTUDIO_API_KEY" },
+  openrouter: { title: "OpenRouter", envKey: "OPENROUTER_API_KEY" },
   coarena: { title: "Coarena", envKey: "COARENA_API_KEY" },
   cohere: { title: "Cohere", envKey: "COHERE_API_KEY" },
 };
@@ -197,7 +197,7 @@ function modelKeyboard(active) {
     reply_markup: {
       inline_keyboard: [
         [
-          { text: label("gemini"), callback_data: "provider:gemini" },
+          { text: label("openrouter"), callback_data: "provider:gemini" },
           { text: label("coarena"), callback_data: "provider:coarena" },
         ],
         [{ text: label("cohere"), callback_data: "provider:cohere" }],
@@ -208,7 +208,7 @@ function modelKeyboard(active) {
 
 async function routeToProvider(provider, history, env) {
   switch (provider) {
-    case "gemini": return askGoogleAI(history, env);
+    case "openrouter": return askOpenRouter(history, env);
     case "coarena": return askCoarena(history, env);
     case "cohere": return askCohere(history, env);
     default: throw new Error("Unsupported provider: " + provider);
@@ -237,31 +237,30 @@ async function askCoarena(history, env) {
   return data.choices?.[0]?.message?.content || "";
 }
 
-async function askGoogleAI(history, env) {
-  const model = env.GOOGLEAI_MODEL || DEFAULTS.googleModel;
-  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" +
-    encodeURIComponent(model) + ":generateContent";
-  const contents = history.map((item) => ({
-    role: item.role === "assistant" ? "model" : "user",
-    parts: [{ text: item.content }],
-  }));
+async function askOpenRouter(history, env) {
+  const model = env.OPENROUTER_MODEL || DEFAULTS.openrouterModel;
+  const messages = [
+    { role: "system", content: env.SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT },
+    ...history.map((item) => ({ role: item.role === "assistant" ? "assistant" : "user", content: item.content })),
+  ];
 
-  const response = await fetchWithTimeout(endpoint, {
+  const response = await fetchWithTimeout("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
+      Authorization: "Bearer " + env.OPENROUTER_API_KEY,
       "Content-Type": "application/json",
-      "x-goog-api-key": env.GOOGLEAISTUDIO_API_KEY,
+      "HTTP-Referer": env.OPENROUTER_SITE_URL || "https://my-telegram-bot.mahdijavid370.workers.dev",
+      "X-Title": env.OPENROUTER_APP_NAME || "Telegram AI Bot",
     },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: env.SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT }] },
-      contents,
-      generationConfig: { temperature: 0.7 },
-    }),
+    body: JSON.stringify({ model, messages, temperature: 0.7 }),
   }, positiveInt(env.AI_TIMEOUT_MS, DEFAULTS.timeoutMs));
 
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error("Google AI HTTP " + response.status + ": " + (data.error?.message || "request failed"));
-  return (data.candidates?.[0]?.content?.parts || []).map((part) => part.text || "").join("\n");
+  if (!response.ok) {
+    const detail = data.error?.message || data.message || "request failed";
+    throw new Error("OpenRouter HTTP " + response.status + ": " + detail);
+  }
+  return parseOpenRouterResponse(data);
 }
 
 async function askCohere(history, env) {
@@ -349,6 +348,7 @@ async function getProvider(chatId, userId, env) {
     saved = await env.CHAT_KV.get("provider_" + chatId);
   }
   const configured = (env.DEFAULT_PROVIDER || DEFAULTS.provider).toLowerCase();
+  if (saved === "gemini") saved = "openrouter"; // Migrate the former Gemini selection to its replacement.
   return PROVIDERS[saved] ? saved : (PROVIDERS[configured] ? configured : DEFAULTS.provider);
 }
 
@@ -395,6 +395,13 @@ export function historyKey(chatId, userId) {
 
 export function providerKey(chatId, userId) {
   return "provider_" + chatId + "_" + userId;
+}
+
+export function parseOpenRouterResponse(data) {
+  const content = data?.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) return content.filter((part) => typeof part?.text === "string").map((part) => part.text).join("\n");
+  return "";
 }
 
 export function parseCohereResponse(data) {
