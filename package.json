@@ -1,0 +1,14 @@
+{
+  "name": "telegram-ai-bot-cloudflare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Telegram AI bot template for Cloudflare Workers with Gemini and Coarena providers",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "kv:create": "wrangler kv namespace create CHAT_KV",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": { "wrangler": "^4.0.0" }
+}

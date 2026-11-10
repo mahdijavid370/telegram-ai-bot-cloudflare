@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-ai-bot",
+  "main": "index.js",
+  "compatibility_date": "2026-11-10",
+  "observability": { "enabled": true },
+  "kv_namespaces": [
+    { "binding": "CHAT_KV", "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" }
+  ]
+}

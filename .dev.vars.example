@@ -1,0 +1,13 @@
+# Copy this file to .dev.vars for local development. Never commit real credentials.
+TELEGRAM_BOT_TOKEN=replace_with_your_telegram_bot_token
+TELEGRAM_WEBHOOK_SECRET=replace_with_a_random_secret
+COARENA_API_KEY=replace_with_your_coarena_api_key
+GOOGLEAISTUDIO_API_KEY=replace_with_your_google_ai_studio_api_key
+DEFAULT_PROVIDER=coarena
+COARENA_BASE_URL=https://coarena.ai/api/v1
+COARENA_MODEL=gemini-3-8-flash
+GOOGLEAI_MODEL=gemini-2.5-flash
+MAX_HISTORY_MESSAGES=20
+MAX_TELEGRAM_LENGTH=3900
+AI_TIMEOUT_MS=55000
+SYSTEM_PROMPT=You are a helpful AI assistant. Reply in the user's language.
