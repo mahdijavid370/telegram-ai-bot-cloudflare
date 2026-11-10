@@ -2,13 +2,13 @@
 TELEGRAM_BOT_TOKEN=replace_with_your_telegram_bot_token
 TELEGRAM_WEBHOOK_SECRET=replace_with_a_random_secret
 COARENA_API_KEY=replace_with_your_coarena_api_key
-GOOGLEAISTUDIO_API_KEY=replace_with_your_google_ai_studio_api_key
+OPENROUTER_API_KEY=replace_with_your_openrouter_api_key
 COHERE_API_KEY=replace_with_your_cohere_api_key
 COHERE_MODEL=command-a-03-2025
 DEFAULT_PROVIDER=coarena
 COARENA_BASE_URL=https://coarena.ai/api/v1
 COARENA_MODEL=gemini-3-8-flash
-GOOGLEAI_MODEL=gemini-2.5-flash
+OPENROUTER_MODEL=openai/gpt-4o-mini
 MAX_HISTORY_MESSAGES=20
 MAX_TELEGRAM_LENGTH=3900
 AI_TIMEOUT_MS=55000

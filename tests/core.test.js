@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { splitText, historyKey, providerKey, parseCohereResponse } from "../index.js";
+import { splitText, historyKey, providerKey, parseCohereResponse, parseOpenRouterResponse } from "../index.js";
 
 test("splitText keeps all text and respects the chunk limit", () => {
   const source = "alpha beta gamma\ndelta epsilon zeta";
@@ -30,4 +30,12 @@ test("parseCohereResponse extracts only text blocks", () => {
 
 test("parseCohereResponse handles missing content", () => {
   assert.equal(parseCohereResponse({}), "");
+});
+
+test("parseOpenRouterResponse extracts chat completion text", () => {
+  assert.equal(parseOpenRouterResponse({ choices: [{ message: { content: "Hello from OpenRouter" } }] }), "Hello from OpenRouter");
+});
+
+test("parseOpenRouterResponse handles missing content", () => {
+  assert.equal(parseOpenRouterResponse({}), "");
 });

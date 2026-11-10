@@ -3,7 +3,7 @@
 قالب آماده و قابل‌تکثیر برای ساخت ربات تلگرام با سه ارائه‌دهنده هوش مصنوعی:
 
 - **Coarena** از طریق API سازگار با OpenAI
-- **Google AI Studio (Gemini)** از طریق Gemini API
+- **OpenRouter** از طریق OpenRouter API
 - **Cohere رسمی** از طریق Cohere Chat API v2
 
 ربات روی Cloudflare Workers اجرا می‌شود و تاریخچه مکالمه هر چت را در Cloudflare KV نگه می‌دارد. برای راه‌اندازی، هر شخص باید توکن تلگرام و کلیدهای API خودش را وارد کند؛ هیچ کلید واقعی نباید داخل مخزن GitHub قرار بگیرد.
@@ -12,7 +12,7 @@
 
 - وب‌هوک تلگرام روی Cloudflare Workers
 - انتخاب ارائه‌دهنده برای هر گفتگو با دستور **/provider** یا منوی دکمه‌ای
-- پشتیبانی از Gemini، Coarena و Cohere رسمی
+- پشتیبانی از OpenRouter، Coarena و Cohere رسمی
 - نگهداری تاریخچه جداگانه برای هر chat ID
 - دستورات **/start** و **/reset**
 - تقسیم پاسخ‌های بلند به پیام‌های قابل ارسال در تلگرام
@@ -65,7 +65,7 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 
     npx wrangler secret put TELEGRAM_BOT_TOKEN
     npx wrangler secret put COARENA_API_KEY
-    npx wrangler secret put GOOGLEAISTUDIO_API_KEY
+    npx wrangler secret put OPENROUTER_API_KEY
     npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
 
 هر فرمان مقدار را به‌صورت تعاملی دریافت می‌کند. اگر از یک ارائه‌دهنده استفاده نمی‌کنی، Secret مربوط به آن را ثبت نکن؛ اما برای فعال‌کردن آن ارائه‌دهنده در ربات، کلیدش لازم است.
@@ -74,16 +74,16 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 
 | نام | مقدار پیش‌فرض | توضیح |
 |---|---|---|
-| **DEFAULT_PROVIDER** | **coarena** | ارائه‌دهنده پیش‌فرض: **coarena** یا **gemini** |
+| **DEFAULT_PROVIDER** | **coarena** | ارائه‌دهنده پیش‌فرض: **coarena** یا **openrouter** |
 | **COARENA_BASE_URL** | **https://coarena.ai/api/v1** | آدرس API |
 | **COARENA_MODEL** | **gemini-3-8-flash** | شناسه مدل در Coarena |
-| **GOOGLEAI_MODEL** | **gemini-2.5-flash** | شناسه مدل در Google AI Studio |
+| **OPENROUTER_MODEL** | **openai/gpt-4o-mini** | شناسه مدل در OpenRouter |
 | **MAX_HISTORY_MESSAGES** | **20** | حداکثر تعداد پیام‌های ذخیره‌شده |
 | **MAX_TELEGRAM_LENGTH** | **3900** | اندازه هر بخش پیام ارسالی |
 | **AI_TIMEOUT_MS** | **55000** | مهلت پاسخ API بر حسب میلی‌ثانیه |
 | **SYSTEM_PROMPT** | متن پیش‌فرض کد | دستور سیستمی مدل |
 
-برای Google AI Studio از [Google AI Studio](https://aistudio.google.com/apikey) کلید API بساز. برای Coarena نیز کلید را از حساب خودت دریافت کن. دسترسی، نام مدل و سهمیه هر سرویس تابع شرایط همان ارائه‌دهنده است.
+برای OpenRouter از [OpenRouter](https://openrouter.ai/keys) کلید API بساز. برای Coarena نیز کلید را از حساب خودت دریافت کن. دسترسی، نام مدل و سهمیه هر سرویس تابع شرایط همان ارائه‌دهنده است.
 
 پس از تغییر متغیرهای Worker، در صورت نیاز Deploy جدید انجام بده:
 
@@ -109,7 +109,7 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 2. به ربات تلگرام پیام **/start** بده.
 3. یک پیام عادی ارسال کن.
 4. با **/provider** ارائه‌دهنده فعال را ببین.
-5. با **/provider gemini** یا **/provider coarena** ارائه‌دهنده را برای همان گفتگو عوض کن.
+5. با **/provider openrouter** یا **/provider coarena** ارائه‌دهنده را برای همان گفتگو عوض کن.
 6. با **/reset** تاریخچه همان گفتگو را پاک کن.
 
 ## متغیرهای محرمانه و غیرمحرمانه
@@ -119,7 +119,7 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 | **TELEGRAM_BOT_TOKEN** | Secret | بله |
 | **TELEGRAM_WEBHOOK_SECRET** | Secret | اختیاری، ولی توصیه‌شده |
 | **COARENA_API_KEY** | Secret | فقط برای استفاده از Coarena |
-| **GOOGLEAISTUDIO_API_KEY** | Secret | فقط برای استفاده از Gemini |
+| **OPENROUTER_API_KEY** | Secret | فقط برای استفاده از OpenRouter |
 
 در محیط Cloudflare، KV باید با نام **CHAT_KV** به Worker متصل باشد.
 
@@ -170,7 +170,7 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 
 این نسخه سه ارائه‌دهنده مستقل دارد:
 
-- **Google Gemini** از طریق Google AI Studio
+- **OpenRouter** از طریق OpenRouter
 - **Coarena** از طریق API سازگار با OpenAI (اتصال قبلی حفظ شده است)
 - **Cohere رسمی** از طریق API نسخه ۲ در `https://api.cohere.com/v2/chat`
 
@@ -195,7 +195,7 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 |---|---|---|
 | `COHERE_MODEL` | `command-a-03-2025` | مدل چت Cohere |
 
-اگر کلید Cohere ثبت نشود، گزینه آن در منو نمایش داده می‌شود اما انتخاب آن با پیام خطای روشن رد می‌شود. Gemini و Coarena مستقل از Cohere کار می‌کنند.
+اگر کلید Cohere ثبت نشود، گزینه آن در منو نمایش داده می‌شود اما انتخاب آن با پیام خطای روشن رد می‌شود. OpenRouter و Coarena مستقل از Cohere کار می‌کنند.
 
 ### تست‌ها
 
