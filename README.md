@@ -76,8 +76,8 @@ Binding باید دقیقاً **CHAT_KV** باشد؛ کد از همین نام �
 |---|---|---|
 | **DEFAULT_PROVIDER** | **coarena** | ارائه‌دهنده پیش‌فرض: **coarena** یا **openrouter** |
 | **COARENA_BASE_URL** | **https://coarena.ai/api/v1** | آدرس API |
-| **COARENA_MODEL** | **openrouter-3-8-flash** | شناسه مدل در Coarena |
-| **OPENROUTER_MODEL** | **openrouter-2.5-flash** | شناسه مدل در OpenRouter |
+| **COARENA_MODEL** | **gemini-3-8-flash** | شناسه مدل در Coarena |
+| **OPENROUTER_MODEL** | **openai/gpt-4o-mini** | شناسه مدل در OpenRouter |
 | **MAX_HISTORY_MESSAGES** | **20** | حداکثر تعداد پیام‌های ذخیره‌شده |
 | **MAX_TELEGRAM_LENGTH** | **3900** | اندازه هر بخش پیام ارسالی |
 | **AI_TIMEOUT_MS** | **55000** | مهلت پاسخ API بر حسب میلی‌ثانیه |
