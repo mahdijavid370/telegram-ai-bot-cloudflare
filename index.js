@@ -197,7 +197,7 @@ function modelKeyboard(active) {
     reply_markup: {
       inline_keyboard: [
         [
-          { text: label("openrouter"), callback_data: "provider:gemini" },
+          { text: label("openrouter"), callback_data: "provider:openrouter" },
           { text: label("coarena"), callback_data: "provider:coarena" },
         ],
         [{ text: label("cohere"), callback_data: "provider:cohere" }],
